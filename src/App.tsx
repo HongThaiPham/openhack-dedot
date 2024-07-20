@@ -1,5 +1,8 @@
 import dedotLogo from './assets/dedot-dark-logo.png';
 import { Container, Flex, Heading } from '@chakra-ui/react';
+import AppProvider from './components/AppProvider';
+import ConnectButton from './components/ConnectButton';
+import AccountList from './components/AccountList';
 
 function App() {
   // 1. Connect to SubWallet
@@ -12,16 +15,22 @@ function App() {
   // 8. Subscribe to balance changing
 
   return (
-    <Container maxW='container.md' my={16}>
-      <Flex justifyContent='center'>
-        <a href='https://dedot.dev' target='_blank'>
-          <img width='100' src={dedotLogo} className='logo' alt='Vite logo' />
-        </a>
-      </Flex>
-      <Heading my={4} textAlign='center'>
-        Open Hack Dedot
-      </Heading>
-    </Container>
+    <AppProvider autoConnect>
+      <Container maxW='container.md' my={16}>
+        <Flex justifyContent='center'>
+          <a href='https://dedot.dev' target='_blank'>
+            <img width='100' src={dedotLogo} className='logo' alt='Vite logo' />
+          </a>
+        </Flex>
+        <Heading my={4} textAlign='center'>
+          Open Hack Dedot
+        </Heading>
+      </Container>
+      <Container>
+        <ConnectButton />
+        <AccountList />
+      </Container>
+    </AppProvider>
   );
 }
 
