@@ -4,9 +4,10 @@ import { InjectedAccount } from '@polkadot/extension-inject/types';
 import { Box, Button, Card, CardBody, CardHeader, Stack, Text } from '@chakra-ui/react';
 import { formatBalance } from '../utils';
 import { WESTEND } from '../networks';
+import { FrameSystemAccountInfo } from 'dedot/chaintypes';
 
 const ConnectedAcount = () => {
-  const { getConnectedAccount, disconnectSubWallet, getAccountBalance } = useAppContext();
+  const { getConnectedAccount, disconnectSubWallet, dedotClient } = useAppContext();
   const [account, setAccount] = useState<InjectedAccount | undefined>(undefined);
   const [balance, setBalance] = useState<bigint | undefined>(undefined);
 
@@ -17,16 +18,25 @@ const ConnectedAcount = () => {
   }, [getConnectedAccount]);
 
   useEffect(() => {
-    if (!account) return;
-    getAccountBalance(account).then((balance) => {
-      setBalance(balance?.data.free);
-    });
-  }, [account, getAccountBalance]);
-
+    if (!dedotClient || !account) return;
+    let unsub: any;
+    (async () => {
+      unsub = await dedotClient?.query.system.account(account.address, (balance: FrameSystemAccountInfo) => {
+        setBalance(balance?.data.free);
+      });
+    })();
+    return () => {
+      unsub && unsub();
+    };
+  }, [account, dedotClient]);
   return (
     <Stack spacing={3}>
       <Card>
-        <CardHeader>Connected Account</CardHeader>
+        <CardHeader>
+          <Text fontSize='lg' as='b'>
+            Connected Account
+          </Text>
+        </CardHeader>
         <CardBody>
           <Box>
             Name:{' '}
