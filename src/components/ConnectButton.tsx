@@ -1,10 +1,21 @@
-import React from 'react';
 import { useAppContext } from './AppProvider';
-import { Button } from '@chakra-ui/react';
+import { Alert, AlertIcon, Box, Button, Stack, Text } from '@chakra-ui/react';
+import ConnectedAcount from './ConnectedAccount';
 
 const ConnectButton = () => {
-  const { connectToSubWallet } = useAppContext();
-  return <Button onClick={() => connectToSubWallet()}> Connect to SubWallet</Button>;
+  const { connectToSubWallet, isConnected } = useAppContext();
+
+  if (!isConnected)
+    return (
+      <Stack spacing={3}>
+        <Alert status='info'>
+          <AlertIcon />
+          Not connected to SubWallet
+        </Alert>
+        <Button onClick={() => connectToSubWallet()}> Connect to SubWallet</Button>
+      </Stack>
+    );
+  return <ConnectedAcount />;
 };
 
 export default ConnectButton;

@@ -1,8 +1,7 @@
 import dedotLogo from './assets/dedot-dark-logo.png';
 import { Container, Flex, Heading } from '@chakra-ui/react';
 import AppProvider from './components/AppProvider';
-import ConnectButton from './components/ConnectButton';
-import AccountList from './components/AccountList';
+import OpenHack from './components/OpenHack';
 
 function App() {
   // 1. Connect to SubWallet
@@ -27,8 +26,7 @@ function App() {
         </Heading>
       </Container>
       <Container>
-        <ConnectButton />
-        <AccountList />
+        <OpenHack />
       </Container>
     </AppProvider>
   );

@@ -9,6 +9,7 @@ Made by the collaboration between [OpenGuild Labs](https://openguild.wtf) and [D
 🎯 Build a simple dapp to show & transfer balance on Polkadot testnet
 
 ### 1. Install SubWallet & create your wallet account
+
 - Install SubWallet Extension: https://www.subwallet.app/download.html
 - Create your first wallet
 - Enable Polkadot testnet: Rococo & Westend
@@ -17,7 +18,6 @@ Made by the collaboration between [OpenGuild Labs](https://openguild.wtf) and [D
 <img float="left" width="200" alt="Xnapper-2024-07-18-21 55 52" src="https://github.com/user-attachments/assets/9dc271e1-74f6-47c6-8f5c-595b6b9f578b">
 <img float="left" width="200" alt="Xnapper-2024-07-18-21 55 33" src="https://github.com/user-attachments/assets/4895a38f-cc19-4b1f-86b6-6681fea2a2dd">
 </p>
-
 
 - Claim testnet token from faucet: https://faucet.polkadot.io/
 <p float="left">
@@ -29,6 +29,7 @@ Made by the collaboration between [OpenGuild Labs](https://openguild.wtf) and [D
 
 - Follow instruction at: https://nodejs.org/en/download/package-manager
 - Or install via nvm:
+
 ```shell
 # installs nvm (Node Version Manager)
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
@@ -46,34 +47,38 @@ npm -v # should print `10.7.0`
 ### 3. Fork, clone the repo
 
 - Fork the repo
-<img width="800" alt="Xnapper-2024-07-18-22 10 30" src="https://github.com/user-attachments/assets/c8be2790-e75f-488b-9e43-b2e7726ffa77">
+  <img width="800" alt="Xnapper-2024-07-18-22 10 30" src="https://github.com/user-attachments/assets/c8be2790-e75f-488b-9e43-b2e7726ffa77">
 
 - Clone the repo
+
 ```shell
 git clone https://github.com/{your-github-username}/openhack-dedot
 ```
+
 E.g: `https://github.com/sinzii/openhack-dedot`
 
 ### 4. Install dependencies & start development mode
 
 - Install dependencies
+
 ```shell
 npm i
 ```
 
 - Start development mode
+
 ```shell
 npm run dev
 ```
+
 - The development application starts at: http://localhost:5173
-  
 
 ### 5. Start building the dapp
 
-- [ ] Connect to wallet
-- [ ] Show connected account (name & address)
-- [ ] Initialize `DedotClient` to connect to the network (Westend testnet)
-- [ ] Fetch & show balance for connected account
+- [x] Connect to wallet
+- [x] Show connected account (name & address)
+- [x] Initialize `DedotClient` to connect to the network (Westend testnet)
+- [x] Fetch & show balance for connected account
 - [ ] Build a form to transfer balance (destination address & amount to transfer)
 - [ ] Check transaction status (in-block & finalized)
 - [ ] Check transaction result (success or not)
@@ -143,7 +148,7 @@ import { Injected, InjectedAccount } from '@polkadot/extension-inject/types';
 const client: DedotClinet = ...;
 
 // Get injected instance & connected account - 6.2
-const injected: Injected = ...; 
+const injected: Injected = ...;
 const account: InjectedAccount = ...;
 
 const amount: number = 1; // how many token in DOT or WND
@@ -158,7 +163,7 @@ await client.tx.balances
         console.log(result.status);
 
         // 'BestChainBlockIncluded': Transaction is included in the best block of the chain
-        // 'Finalized': Transaction is finalized  
+        // 'Finalized': Transaction is finalized
         if (result.status.type === 'BestChainBlockIncluded' || result.status.type === 'Finalized') {
           if (result.dispatchError) {
             // Transaction is included but has an error
@@ -183,7 +188,7 @@ const account: InjectedAccount = accounts[0]; // get from accounts list - 6.2
 // Pass in a callback to be called whenver the balance is changed/updated
 const unsub = await client.query.system.account(account.address, (balance: FrameSystemAccountInfo) => {
   // Get free/transferable balance
-  const freeBalance = formatBalance(balance.data.free, WESTEND.decimals);   
+  const freeBalance = formatBalance(balance.data.free, WESTEND.decimals);
 });
 ```
 
@@ -200,6 +205,7 @@ Prerequisite: Complete the main activity
 A bounty of 2 DOT to claim for the first 5 participants to submit the challenge to OpenGuild
 
 ### 🙋 How to claim the bounty?
+
 👉 Complete the challenge on your fork repository <br/>
 👉 Star Dedot repository <br/>
 👉 Follow OpenGuild Lab Github <br/>
@@ -207,6 +213,7 @@ A bounty of 2 DOT to claim for the first 5 participants to submit the challenge 
 👉 Submit the proof-of-work (your challenge repository) to OpenGuild Discord <br/>
 
 ---
+
 # 🙌 How to contribute to the community?
 
 To submit a proposal, ideas, or any questions, please submit them here: [OpenGuild Discussion 💬](https://github.com/orgs/openguild-labs/discussions)
@@ -219,4 +226,3 @@ View tickets and activities that you can contribute: [Community Activities 🖐�
 - **Propose project ideas:** Your creativity and innovation are welcomed at OpenGuild. Propose project ideas that align with the goals of our community. Whether it's a new application, a tool, or a solution addressing a specific challenge in the Polkadot ecosystem, your ideas can spark exciting collaborations.
 
 - **Contribute to our developer tools:** Get involved in the ongoing development and improvement of tools that aid developers in their projects. Whether it's through code contributions, bug reports, or feature suggestions, your involvement in enhancing these tools strengthens the foundation for innovation within OpenGuild and the broader Polkadot community.
-

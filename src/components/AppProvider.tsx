@@ -3,21 +3,29 @@ import { DedotClient, WsProvider } from 'dedot';
 import { WestendApi } from '@dedot/chaintypes';
 import { WESTEND } from '../networks';
 import { Injected, InjectedAccount, InjectedWindowProvider, InjectedWindow } from '@polkadot/extension-inject/types';
+import { useToast } from '@chakra-ui/react';
+import { FrameSystemAccountInfo } from 'dedot/chaintypes';
 
 interface ContextState {
   dedotClient: DedotClient<WestendApi> | null;
   provider: InjectedWindowProvider | undefined;
   connectToSubWallet: () => Promise<void>;
-  getConnectedAccount: () => Promise<InjectedAccount[]>;
+  getConnectedAccounts: () => Promise<InjectedAccount[]>;
+  getConnectedAccount: () => Promise<InjectedAccount | undefined>;
   isConnected: boolean;
+  disconnectSubWallet: () => Promise<void>;
+  getAccountBalance: (account: InjectedAccount) => Promise<FrameSystemAccountInfo | undefined>;
 }
 
 export const AppContext = createContext<ContextState>({
   dedotClient: null,
   provider: undefined,
   connectToSubWallet: async () => {},
-  getConnectedAccount: async () => [],
+  getConnectedAccounts: async () => [],
+  getConnectedAccount: async () => undefined,
   isConnected: false,
+  disconnectSubWallet: async () => {},
+  getAccountBalance: async () => undefined,
 });
 
 // eslint-disable-next-line react-refresh/only-export-components
@@ -26,9 +34,9 @@ type Props = {
   autoConnect?: boolean;
 } & PropsWithChildren;
 const AppProvider: React.FC<Props> = ({ children, autoConnect }) => {
+  const toast = useToast();
   const [dedotClient, setDedotClient] = useState<DedotClient<WestendApi> | null>(null);
   const [injected, setInjected] = useState<Injected | null>(null);
-  const [connectedAccount, setConnectedAccount] = useState<string | null>(null);
 
   const InitClient = useCallback(async () => {
     if (!dedotClient) {
@@ -48,27 +56,59 @@ const AppProvider: React.FC<Props> = ({ children, autoConnect }) => {
     // Connect with SubWallet from the dapp
     const injected: Injected = await provider.enable!('Open Hack Dapp');
     setInjected(injected);
-    console.log('Injected:', injected);
+    // console.log('Injected:', injected);
   }, [provider]);
 
-  const getConnectedAccount = async () => {
+  const getConnectedAccounts = async () => {
     if (!injected) return [];
     const accounts: InjectedAccount[] = await injected.accounts.get();
-    console.log('Accounts:', accounts);
+    // console.log('Accounts:', accounts);
     return accounts;
+  };
+
+  const getConnectedAccount = async () => {
+    const accounts = await getConnectedAccounts();
+    // console.log('Accounts:', accounts);
+    return accounts[0];
   };
 
   const isConnected = useMemo(() => !!injected, [injected]);
 
+  const disconnectSubWallet = useCallback(async () => {
+    if (!injected) return;
+    await injected.provider?.disconnect();
+    setInjected(null);
+  }, [injected]);
+
+  const getAccountBalance = async (account: InjectedAccount) => {
+    if (!dedotClient) return;
+    const balance = await dedotClient.query.system.account(account.address);
+    return balance;
+  };
+
   useEffect(() => {
-    InitClient();
+    toast.promise(InitClient(), {
+      loading: { title: 'Initializing dedot client' },
+      success: { title: 'Initialized dedot client' },
+      error: { title: 'Failed to initialize dedot client' },
+    });
     if (autoConnect) {
       connectToSubWallet();
     }
-  }, [InitClient, autoConnect, connectToSubWallet]);
+  }, []);
 
   return (
-    <AppContext.Provider value={{ dedotClient, provider, connectToSubWallet, getConnectedAccount, isConnected }}>
+    <AppContext.Provider
+      value={{
+        dedotClient,
+        provider,
+        connectToSubWallet,
+        getConnectedAccounts,
+        isConnected,
+        disconnectSubWallet,
+        getAccountBalance,
+        getConnectedAccount,
+      }}>
       {children}
     </AppContext.Provider>
   );
