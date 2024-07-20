@@ -135,7 +135,7 @@ const AppProvider: React.FC<Props> = ({ children, autoConnect }) => {
                     </Link>
                   ),
                   status: 'info',
-                  duration: 9000,
+
                   isClosable: true,
                 });
                 resolve();
@@ -190,7 +190,7 @@ const AppProvider: React.FC<Props> = ({ children, autoConnect }) => {
                     </Link>
                   ),
                   status: 'info',
-                  duration: 9000,
+
                   isClosable: true,
                 });
                 resolve();

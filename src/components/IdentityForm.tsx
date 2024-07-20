@@ -17,7 +17,7 @@ import { useEffect, useState } from 'react';
 
 const IdentityForm = () => {
   const toast = useToast();
-  const { setOnchainIdentity, getOnchainIdentity } = useAppContext();
+  const { setOnchainIdentity, getOnchainIdentity, isConnected } = useAppContext();
   const [display, setDisplay] = useState('');
   const [email, setEmail] = useState('');
   const [discord, setDiscord] = useState('');
@@ -46,6 +46,11 @@ const IdentityForm = () => {
 
     await setOnchainIdentity(display, email, discord);
   };
+
+  if (!isConnected) {
+    return null;
+  }
+
   return (
     <Card>
       <CardHeader>

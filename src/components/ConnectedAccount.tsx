@@ -5,6 +5,7 @@ import { Box, Button, Card, CardBody, CardFooter, CardHeader, HStack, Stack, Tex
 import { formatBalance } from '../utils';
 import { WESTEND } from '../networks';
 import { FrameSystemAccountInfo } from 'dedot/chaintypes';
+import TransferModalButton from './TransferModalButton';
 
 const ConnectedAcount = () => {
   const { getConnectedAccount, disconnectSubWallet, dedotClient, transfer } = useAppContext();
@@ -29,10 +30,6 @@ const ConnectedAcount = () => {
       unsub && unsub();
     };
   }, [account, dedotClient]);
-
-  const handleTransfer = async () => {
-    transfer('5GTH6Mo6mKr2fBESmziVUnHA2E1JHQ9DGQbgZeQiuCHFCwA1');
-  };
 
   return (
     <Stack spacing={3}>
@@ -64,9 +61,7 @@ const ConnectedAcount = () => {
         </CardBody>
         <CardFooter>
           <HStack spacing={3}>
-            <Button onClick={handleTransfer} colorScheme={'green'}>
-              Transfer
-            </Button>
+            <TransferModalButton />
             <Button onClick={() => disconnectSubWallet()} colorScheme={'red'}>
               Disconnect
             </Button>
