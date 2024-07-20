@@ -17,6 +17,7 @@ interface ContextState {
   getAccountBalance: (account: InjectedAccount) => Promise<FrameSystemAccountInfo | undefined>;
   setOnchainIdentity: (display: string, email: string, discord: string) => Promise<void>;
   getOnchainIdentity: (account?: InjectedAccount) => Promise<any>;
+  transfer: (to: string, amount?: number) => Promise<void>;
 }
 
 export const AppContext = createContext<ContextState>({
@@ -30,6 +31,7 @@ export const AppContext = createContext<ContextState>({
   getAccountBalance: async () => undefined,
   setOnchainIdentity: async () => {},
   getOnchainIdentity: async () => {},
+  transfer: async () => {},
 });
 
 // eslint-disable-next-line react-refresh/only-export-components
@@ -159,6 +161,50 @@ const AppProvider: React.FC<Props> = ({ children, autoConnect }) => {
     return identity ? identity[0].info : null;
   };
 
+  const transfer = async (to: string, amount: number = 0.01) => {
+    if (!dedotClient || !injected) return;
+    const connectedAccount = await getConnectedAccount();
+    const amountToTransfer: bigint = (BigInt(amount * 1000) * BigInt(Math.pow(10, WESTEND.decimals))) / BigInt(1000);
+    toast.promise(
+      new Promise<void>((resolve, reject) => {
+        dedotClient.tx.balances
+          .transferKeepAlive(to, amountToTransfer)
+          .signAndSend(connectedAccount.address, { signer: injected.signer }, (result) => {
+            console.log(result.status);
+            console.log(result);
+
+            // 'BestChainBlockIncluded': Transaction is included in the best block of the chain
+            // 'Finalized': Transaction is finalized
+            if (result.status.type === 'BestChainBlockIncluded' || result.status.type === 'Finalized') {
+              if (result.dispatchError) {
+                // Transaction is included but has an error
+                const error = `${JSON.stringify(Object.values(result.dispatchError))}`;
+                reject(error);
+              } else {
+                // Transaction is included and executed successfully
+                toast({
+                  title: 'Transaction sent',
+                  description: (
+                    <Link href={`https://westend.subscan.io/extrinsic/${result.txHash}`} isExternal>
+                      View on Subscan
+                    </Link>
+                  ),
+                  status: 'info',
+                  duration: 9000,
+                  isClosable: true,
+                });
+                resolve();
+              }
+            }
+          });
+      }),
+      {
+        loading: { title: 'Transferring' },
+        success: { title: 'Transfer successfully' },
+        error: { title: 'Failed to transfer' },
+      },
+    );
+  };
   useEffect(() => {
     toast.promise(InitClient(), {
       loading: { title: 'Initializing dedot client' },
@@ -183,6 +229,7 @@ const AppProvider: React.FC<Props> = ({ children, autoConnect }) => {
         getConnectedAccount,
         setOnchainIdentity,
         getOnchainIdentity,
+        transfer,
       }}>
       {children}
     </AppContext.Provider>

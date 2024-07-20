@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useAppContext } from './AppProvider';
 import { InjectedAccount } from '@polkadot/extension-inject/types';
-import { Box, Button, Card, CardBody, CardHeader, Stack, Text } from '@chakra-ui/react';
+import { Box, Button, Card, CardBody, CardFooter, CardHeader, HStack, Stack, Text } from '@chakra-ui/react';
 import { formatBalance } from '../utils';
 import { WESTEND } from '../networks';
 import { FrameSystemAccountInfo } from 'dedot/chaintypes';
 
 const ConnectedAcount = () => {
-  const { getConnectedAccount, disconnectSubWallet, dedotClient } = useAppContext();
+  const { getConnectedAccount, disconnectSubWallet, dedotClient, transfer } = useAppContext();
   const [account, setAccount] = useState<InjectedAccount | undefined>(undefined);
   const [balance, setBalance] = useState<bigint | undefined>(undefined);
 
@@ -29,6 +29,11 @@ const ConnectedAcount = () => {
       unsub && unsub();
     };
   }, [account, dedotClient]);
+
+  const handleTransfer = async () => {
+    transfer('5GTH6Mo6mKr2fBESmziVUnHA2E1JHQ9DGQbgZeQiuCHFCwA1');
+  };
+
   return (
     <Stack spacing={3}>
       <Card>
@@ -57,11 +62,17 @@ const ConnectedAcount = () => {
             </Text>
           </Box>
         </CardBody>
+        <CardFooter>
+          <HStack spacing={3}>
+            <Button onClick={handleTransfer} colorScheme={'green'}>
+              Transfer
+            </Button>
+            <Button onClick={() => disconnectSubWallet()} colorScheme={'red'}>
+              Disconnect
+            </Button>
+          </HStack>
+        </CardFooter>
       </Card>
-
-      <Button onClick={() => disconnectSubWallet()} colorScheme={'red'}>
-        Disconnect
-      </Button>
     </Stack>
   );
 };
